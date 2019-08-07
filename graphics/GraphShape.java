@@ -19,7 +19,6 @@ public class GraphShape {
 
 	private static double radOfNode = 0;
 	private static double radOfOuterCircle = 0;
-	private static double radOfMiddleCircle = 0;
 
 	public static void setNodeNum(int nodeNum) {
 		maxNodeNum = nodeNum;
@@ -41,14 +40,14 @@ public class GraphShape {
 		radOfNode = (radOfOuterCircle * Math.sin(Math.toRadians(anglePerNode / 2)))
 				/ (Math.sin(Math.toRadians(anglePerNode / 2)) + 1);
 
-		radOfMiddleCircle = radOfOuterCircle - radOfNode / 2;
 	}
 
 	public static void drawGraph(Graph graph, Graphics2D g2d) {
 		int id = graph.id;
 
 		g2d.setColor(new Color((((id % 65535) * 31 * (maxNodeNum % 256) + 241) % 256),
-				(((id % 65535) * 61 * (maxNodeNum % 499) + 128) % 256), (((id % 65535) * 17 * (maxNodeNum % 997) + 128) % 256)));
+				(((id % 65535) * 61 * (maxNodeNum % 499) + 128) % 256),
+				(((id % 65535) * 17 * (maxNodeNum % 997) + 128) % 256)));
 
 		Point currentNode = getPosOfGraph(id);
 
@@ -67,13 +66,14 @@ public class GraphShape {
 
 	public static void drawLine(Graph graph, Graphics2D g2d) {
 		int id = graph.id;
-		HashMap<Integer, Line> lines = graph.getAllConnection();
+		HashMap<Integer, Integer> lines = graph.getAllConnection();
 		g2d.setColor(new Color((((id % 65535) * 31 * (maxNodeNum % 256) + 241) % 256),
-				(((id % 65535) * 61 * (maxNodeNum % 499) + 128) % 256), (((id % 65535) * 17 * (maxNodeNum % 997) + 128) % 256)));
+				(((id % 65535) * 61 * (maxNodeNum % 499) + 128) % 256),
+				(((id % 65535) * 17 * (maxNodeNum % 997) + 128) % 256)));
 
 		Point src = getPosOfGraph(id);
 
-		lines.forEach((tid, line) -> {
+		lines.forEach((tid, cost) -> {
 			Point dst = getPosOfGraph(tid);
 			int srcLineX = (int) (src.x - radOfNode / 2 + screenWidth / 2);
 			int srcLineY = (int) (src.y - radOfNode / 2 + screenHeight / 2) + 16;
@@ -86,7 +86,7 @@ public class GraphShape {
 			int midofLineY = (int) (srcLineY * 0.8 + dstLineY * 0.2);
 
 			g2d.setFont(new Font("Consolas", Font.PLAIN, 15));
-			g2d.drawString(String.valueOf(line.getCost()), midofLineX, midofLineY + 16);
+			g2d.drawString(String.valueOf(cost), midofLineX, midofLineY + 16);
 		});
 
 	}
@@ -95,8 +95,8 @@ public class GraphShape {
 
 		double angleOfCurrentNode = Math.toRadians(anglePerNode * ID);
 
-		double nodePosX = Math.cos(angleOfCurrentNode) * (screenWidth - radOfNode*2) / 2;
-		double nodePosY = Math.sin(angleOfCurrentNode) * (screenHeight - radOfNode*2) / 2;
+		double nodePosX = Math.cos(angleOfCurrentNode) * (screenWidth - radOfNode * 2) / 2;
+		double nodePosY = Math.sin(angleOfCurrentNode) * (screenHeight - radOfNode * 2) / 2;
 
 		return new Point((int) nodePosX, (int) nodePosY);
 	}

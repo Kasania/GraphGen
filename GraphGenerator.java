@@ -27,7 +27,7 @@ public class GraphGenerator {
 
 	public ArrayList<Graph> generate(ArrayList<Integer> values) {
 		graphs.clear();
-
+		
 		int NodeNum = values.get(0);
 		int MinLine = values.get(1);
 		int MaxLine = values.get(2);
@@ -38,29 +38,41 @@ public class GraphGenerator {
 			Graph graph = new Graph(i);
 			graphs.add(graph);
 		}
-
+		
 		for (Graph graph : graphs) {
+			
 			int lineNum = Util.randBetween(MinLine, MaxLine);
-			int leftAttept = graphs.size() * 10;
-
+			
+			int leftAttept = graphs.size() * lineNum;
+			
 			for (int i = graph.getAllConnection().size(); i < lineNum; ++i) {
+				
 				if (leftAttept < 0) {
 					break;
 				}
+				
 				int connectTo = Util.randBetween(0, NodeNum - 1);
+				
+				
 				if (connectTo == graph.id) {
 					--i;
+					
 					continue;
 				} else if (graph.hasConnection(connectTo)) {
+					
 					continue;
 				} else if (graphs.get(connectTo).getAllConnection().size() >= MaxLine) {
 					--i;
 					--leftAttept;
 					continue;
 				} else {
-					graph.connectTo(graphs.get(connectTo), Util.randBetween(MinCost, MaxCost));
+					int cost = Util.randBetween(MinCost, MaxCost);
+					graph.connectTo(connectTo, cost);
+					graphs.get(connectTo).connectTo(graph.id, cost);
 				}
+				
 			}
+			
 
 		}
 
@@ -76,7 +88,7 @@ public class GraphGenerator {
 			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 			BufferedReader br = new BufferedReader(isr);
 
-			String firstLine = br.readLine(); 
+			String firstLine = br.readLine();
 			
 			if(firstLine.contentEquals(FilePrefix)) {
 				int nodeNum = Integer.parseInt(br.readLine());
@@ -100,7 +112,7 @@ public class GraphGenerator {
 							int target = Integer.parseInt(values[0]);
 							int Cost = Integer.parseInt(values[1]);;
 							
-							graphs.get(id).connectTo(graphs.get(target), Cost);
+							graphs.get(id).connectTo(target, Cost);
 							
 						}
 						
@@ -130,23 +142,23 @@ public class GraphGenerator {
 			OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
 			BufferedWriter bw = new BufferedWriter(osw);
 			
+			
 			bw.append(FilePrefix + "\r\n");
 			
 			bw.append(graphs.size() + "\r\n");
 			
 			for (Graph graph : graphs) {
+				StringBuilder sb = new StringBuilder();
 				int id = graph.id;
-				bw.append(NodePrefix+"\r\n" );
-				bw.append(id + "\r\n");
-				graph.getAllConnection().forEach((connected,line)->{
-					try {
-						bw.append(connected + "," + line.getCost() + "\r\n");
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+				sb.append(NodePrefix+"\r\n" );
+				sb.append(id + "\r\n");
+				graph.getAllConnection().forEach((connected,cost)->{
+					sb.append(connected + "," + cost + "\r\n");
 				});
-				bw.append(NodePostfix + "\r\n");
+				sb.append(NodePostfix + "\r\n");
+				bw.append(sb.toString());
 			}
+			
 			
 
 			bw.close();
